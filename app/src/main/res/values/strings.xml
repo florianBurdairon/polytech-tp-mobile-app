@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Polytech App Mobile</string>
+    <string name="fileprovider">fr.burdairon.florian.fileprovider</string>
+</resources>
