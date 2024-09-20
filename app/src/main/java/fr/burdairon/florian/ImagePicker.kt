@@ -68,7 +68,7 @@ fun ImagePicker(
 
     val takePhotoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
-        onResult = {isSaved ->
+        onResult = { _ ->
             tempUri.value?.let {
                 onSetUri.invoke(it)
             }

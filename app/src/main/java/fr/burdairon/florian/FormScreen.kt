@@ -1,11 +1,7 @@
 package fr.burdairon.florian
 
-import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
-import android.provider.MediaStore
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,9 +24,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -41,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +49,6 @@ import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -63,18 +57,22 @@ import java.util.Date
 
 @Destination
 @Composable
-fun FormScreen(navigator: DestinationsNavigator, resultNavigator: ResultBackNavigator<Product>, snackbarHostState: SnackbarHostState, defaultName: String = "") {
+fun FormScreen(
+    resultNavigator: ResultBackNavigator<Product>,
+    snackbarHostState: SnackbarHostState,
+    defaultName: String = ""
+) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    var productType by remember { mutableStateOf(ProductType.CONSOMMABLE) }
-    var name by remember { mutableStateOf(defaultName) }
-    var date by remember { mutableStateOf("") }
-    var color: ColorEnvelope? by remember { mutableStateOf(null) }
-    var country by remember { mutableStateOf("") }
-    var isFavorite by remember { mutableStateOf(false) }
+    var productType by rememberSaveable { mutableStateOf(ProductType.CONSOMMABLE) }
+    var name by rememberSaveable { mutableStateOf(defaultName) }
+    var date by rememberSaveable { mutableStateOf("") }
+    var color: String by rememberSaveable { mutableStateOf("") }
+    var country by rememberSaveable { mutableStateOf("") }
+    var isFavorite by rememberSaveable { mutableStateOf(false) }
 
-    var imageUri: Uri? by remember { mutableStateOf(null) }
+    var imageUri: Uri? by rememberSaveable { mutableStateOf(null) }
 
     Column(
         modifier = Modifier
@@ -102,7 +100,7 @@ fun FormScreen(navigator: DestinationsNavigator, resultNavigator: ResultBackNavi
         DateField(date, label = { Text("Date d'achat*") }, onDateSelected = { date = it }, onDismiss = {})
 
         // Display the color picker dialog
-        ColorField(color) { color = it }
+        ColorField(color) { color = it.hexCode }
 
         TextField(value = country, onValueChange = { country = it }, label = { Text("Pays d'origine") })
 
@@ -112,7 +110,7 @@ fun FormScreen(navigator: DestinationsNavigator, resultNavigator: ResultBackNavi
         // Display the validate button
         ValidateButton(productType, name, date, color, country, isFavorite, scope, snackbarHostState) { validate ->
             if (validate) {
-                resultNavigator.navigateBack(Product(imageUri, productType, name, date, color, country, isFavorite))
+                resultNavigator.navigateBack(Product(imageUri?.toString() ?: "", productType, name, date, color, country, isFavorite))
             }
         }
     }
@@ -223,11 +221,11 @@ fun DateField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ColorField(color: ColorEnvelope?, onColorSelected: (ColorEnvelope) -> Unit) {
+fun ColorField(color: String, onColorSelected: (ColorEnvelope) -> Unit) {
     var dialogVisibility by remember { mutableStateOf(false) }
     val controller = rememberColorPickerController()
 
-    TextField(value = color?.hexCode ?: "", onValueChange = { },
+    TextField(value = color, onValueChange = { },
         label = { Text("Couleur") },
         enabled = false,
         modifier = Modifier.clickable { dialogVisibility = true },
@@ -245,7 +243,9 @@ fun ColorField(color: ColorEnvelope?, onColorSelected: (ColorEnvelope) -> Unit) 
         return
     }
 
-    var tempColor = color
+    var tempColor = if (color.isNotBlank()) ColorEnvelope(hexCode = color, color = Color(android.graphics.Color.parseColor("#$color")), fromUser = true) else null
+    val initialColor = if (color.isNotBlank()) ColorEnvelope(hexCode = color, color = Color(android.graphics.Color.parseColor("#$color")), fromUser = true) else null
+
 
     BasicAlertDialog(
         properties = DialogProperties(
@@ -272,7 +272,7 @@ fun ColorField(color: ColorEnvelope?, onColorSelected: (ColorEnvelope) -> Unit) 
                     onColorChanged = { colorEnvelope: ColorEnvelope ->
                         tempColor = colorEnvelope
                     },
-                    initialColor = color?.color ?: Color.White
+                    initialColor = initialColor?.color ?: Color.White
                 )
                 Row(
                     horizontalArrangement = Arrangement.Absolute.Right,
@@ -307,7 +307,7 @@ fun ValidateButton(
     productType: ProductType,
     name: String,
     date: String,
-    color: ColorEnvelope?,
+    color: String,
     country: String,
     isFavorite: Boolean,
     scope: CoroutineScope,
@@ -354,7 +354,7 @@ fun ValidateButton(
             Text("Type : $productType")
             Text("Nom : $name")
             Text("Date : $date")
-            Text("Couleur : ${color?.hexCode ?: ""}")
+            Text("Couleur : $color")
             Text("Pays : $country")
             Text("Favori : ${if (isFavorite) "oui" else "non"}")
             Row(
@@ -389,11 +389,11 @@ private fun convertMillisToDate(millis: Long): String {
 }
 
 data class Product(
-    val image: Uri?,
+    val image: String,
     val type: ProductType,
     val name: String,
     val date: String,
-    val color: ColorEnvelope?,
+    val color: String,
     val country: String,
     val isFavorite: Boolean
 ) : Serializable
