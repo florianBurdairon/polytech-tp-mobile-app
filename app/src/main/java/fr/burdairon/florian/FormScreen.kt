@@ -2,6 +2,7 @@ package fr.burdairon.florian
 
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -132,6 +133,7 @@ fun ProductTypeSelector(productType: ProductType, onProductTypeSelected: (Produc
 @Composable
 fun ImageDisplay(uri: Uri?, productType: ProductType) {
     if (uri == null) {
+        Log.i("image","product type image")
         Image(
             painter = painterResource(id = productType.getDrawable()),
             contentDescription = "Product type image"
