@@ -1,4 +1,4 @@
-package fr.burdairon.florian
+package fr.burdairon.florian.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,11 +9,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,19 +19,23 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
-import fr.burdairon.florian.destinations.FormScreenDestination
+import fr.burdairon.florian.model.Product
+import fr.burdairon.florian.viewmodels.ProductViewModel
+import fr.burdairon.florian.views.destinations.FormScreenDestination
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.getViewModel
 
 @Destination(start = true)
 @Composable
 fun MainScreen(navigator: DestinationsNavigator, resultRecipient: ResultRecipient<FormScreenDestination, Product>, snackbarHostState: SnackbarHostState) {
     val scope = rememberCoroutineScope()
-    var productList: List<Product> by rememberSaveable { mutableStateOf(listOf()) }
+    val productViewModel: ProductViewModel = getViewModel()
+
+    val uiState by productViewModel.uiState.collectAsState()
 
     resultRecipient.onNavResult {
         if (it is NavResult.Value) {
-            val products = productList.toMutableList()
-            productList = products.apply { add(it.value) }
+            productViewModel.addProduct(it.value)
             scope.launch {
                 snackbarHostState.showSnackbar("Le produit a bien été ajouté")
             }
@@ -73,9 +75,8 @@ fun MainScreen(navigator: DestinationsNavigator, resultRecipient: ResultRecipien
             }
         }
 
-        ProductList(productList) {
-            val products = productList.toMutableList()
-            productList = products.apply { remove(it) }
+        ProductList(uiState) {
+            productViewModel.deleteProduct(it)
         }
     }
 }

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.devtools.ksp)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -21,6 +22,7 @@ android {
         }
     }
 
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -39,6 +41,7 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -60,11 +63,30 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.databinding.adapters)
     ksp(libs.compose.destinations.ksp)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.preferences.rxjava2)
     implementation(libs.androidx.datastore.preferences.rxjava3)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    //retrofit
+    implementation(libs.retrofit2.retrofit)
+    implementation(libs.retrofit2.adapter.rxjava2)
+    implementation(libs.converter.gson)
+
+    //okhttp
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+
+
+    // Koin for the dependencies injections
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.android)
+
+    // for room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

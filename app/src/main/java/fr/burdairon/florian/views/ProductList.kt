@@ -1,4 +1,4 @@
-package fr.burdairon.florian
+package fr.burdairon.florian.views
 
 import android.net.Uri
 import android.widget.Toast
@@ -17,22 +17,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import fr.burdairon.florian.model.Product
+import fr.burdairon.florian.viewmodels.MainUiState
 
 @Composable
-fun ProductList(productList: List<Product>, onProductRemove: (Product) -> Unit) {
-    if (productList.isEmpty()) {
+fun ProductList(uiState: MainUiState, onProductRemove: (Product) -> Unit) {
+    if (uiState.productList.isEmpty()) {
         Text("Aucun produit")
-        return
     }
-    Text("Liste des produits")
-    LazyColumn {
-        items(productList.size) { product ->
-            ProductRow(productList[product]) {
-                // Remove the product from the list
-                onProductRemove(productList[product])
+    else {
+        Text("Liste des produits")
+        LazyColumn {
+            items(uiState.productList.size) { product ->
+                ProductRow(uiState.productList[product]) {
+                    // Remove the product from the list
+                    onProductRemove(uiState.productList[product])
+                }
             }
         }
     }
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)

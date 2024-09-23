@@ -1,4 +1,4 @@
-package fr.burdairon.florian
+package fr.burdairon.florian.views
 
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
@@ -51,9 +51,10 @@ import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import fr.burdairon.florian.R
+import fr.burdairon.florian.model.Product
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.io.Serializable
 import java.util.Date
 
 @Destination
@@ -111,7 +112,7 @@ fun FormScreen(
         // Display the validate button
         ValidateButton(productType, name, date, color, country, isFavorite, scope, snackbarHostState) { validate ->
             if (validate) {
-                resultNavigator.navigateBack(Product(imageUri?.toString() ?: "", productType, name, date, color, country, isFavorite))
+                resultNavigator.navigateBack(Product(id = 0, image = imageUri?.toString() ?: "", type = productType, name = name, date = date, color = color, country = country,  isFavorite = isFavorite))
             }
         }
     }
@@ -389,16 +390,6 @@ private fun convertMillisToDate(millis: Long): String {
     val formatter = SimpleDateFormat("dd/MM/yyyy")
     return formatter.format(Date(millis))
 }
-
-data class Product(
-    val image: String,
-    val type: ProductType,
-    val name: String,
-    val date: String,
-    val color: String,
-    val country: String,
-    val isFavorite: Boolean
-) : Serializable
 
 enum class ProductType {
     CONSOMMABLE{

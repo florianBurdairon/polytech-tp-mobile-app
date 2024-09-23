@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.dependency
 import fr.burdairon.florian.ui.theme.PolytechAppMobileTheme
+import fr.burdairon.florian.views.NavGraphs
 
 
 class MainActivity : ComponentActivity() {

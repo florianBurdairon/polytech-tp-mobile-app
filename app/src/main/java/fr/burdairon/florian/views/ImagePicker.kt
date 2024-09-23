@@ -1,5 +1,6 @@
-package fr.burdairon.florian
+package fr.burdairon.florian.views
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
+import fr.burdairon.florian.R
 import java.io.File
 
 @Composable
@@ -97,7 +99,7 @@ fun ImagePicker(
             onTakePhotoClick = {
                 showBottomSheet = false
 
-                val permission = android.Manifest.permission.CAMERA
+                val permission = Manifest.permission.CAMERA
                 if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
                 ) {
                     // Permission is already granted, proceed to step 2
