@@ -1,34 +1,51 @@
 package fr.burdairon.florian.repositories
 
-import android.util.Log
 import fr.burdairon.florian.dao.ProductDao
 import fr.burdairon.florian.model.Product
 import fr.burdairon.florian.utils.AppResult
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 interface ProductRepository {
     suspend fun getAll(): AppResult<List<Product>>
+    suspend fun getFavorite(): AppResult<List<Product>>
     suspend fun addProduct(product: Product): AppResult<Unit>
     suspend fun deleteProduct(product: Product): AppResult<Unit>
     suspend fun updateProduct(product: Product): AppResult<Unit>
 }
 
 class ProductRepositoryImpl(private val dao: ProductDao) : ProductRepository {
+    private val scope = CoroutineScope(Dispatchers.IO)
+
     override suspend fun getAll(): AppResult<List<Product>> {
         val data = withContext(Dispatchers.IO) {
             dao.getAll()
         }
         return if (data.isNotEmpty()) {
-            Log.d("product db", "from db")
             AppResult.Success(data)
-        } else
+        } else {
             AppResult.Error(Exception("No data in db"))
+        }
+    }
+
+    override suspend fun getFavorite(): AppResult<List<Product>> {
+        val data = withContext(Dispatchers.IO) {
+            dao.getAll().filter { it.isFavorite }
+        }
+        return if (data.isNotEmpty()) {
+            AppResult.Success(data)
+        } else {
+            AppResult.Error(Exception("No favorite in db"))
+        }
     }
 
     override suspend fun addProduct(product: Product): AppResult<Unit> {
         try {
-            dao.insert(product)
+            scope.launch {
+                dao.insert(product)
+            }.join()
             return AppResult.Success(Unit)
         } catch (e: Exception) {
             return AppResult.Error(e)
@@ -37,7 +54,9 @@ class ProductRepositoryImpl(private val dao: ProductDao) : ProductRepository {
 
     override suspend fun deleteProduct(product: Product): AppResult<Unit> {
         try {
-            dao.delete(product)
+            scope.launch {
+                dao.delete(product)
+            }.join()
             return AppResult.Success(Unit)
         } catch (e: Exception) {
             return AppResult.Error(e)
@@ -46,7 +65,9 @@ class ProductRepositoryImpl(private val dao: ProductDao) : ProductRepository {
 
     override suspend fun updateProduct(product: Product): AppResult<Unit> {
         try {
-            dao.update(product)
+            scope.launch {
+                dao.update(product)
+            }.join()
             return AppResult.Success(Unit)
         } catch (e: Exception) {
             return AppResult.Error(e)

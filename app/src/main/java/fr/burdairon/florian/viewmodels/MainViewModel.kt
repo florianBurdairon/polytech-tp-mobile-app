@@ -1,17 +1,19 @@
 package fr.burdairon.florian.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import fr.burdairon.florian.model.Product
 import fr.burdairon.florian.repositories.ProductRepository
 import fr.burdairon.florian.utils.AppResult
+import fr.burdairon.florian.utils.MainUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ProductViewModel(private val repository: ProductRepository): ViewModel() {
+class MainViewModel(private val repository: ProductRepository): ViewModel() {
 
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
@@ -20,6 +22,7 @@ class ProductViewModel(private val repository: ProductRepository): ViewModel() {
         viewModelScope.launch {
             when (val result = repository.getAll()) {
                 is AppResult.Success -> {
+                    Log.d("db", "getAll success")
                     _uiState.update {
                         it.copy(productList = result.successData)
                     }
@@ -29,15 +32,14 @@ class ProductViewModel(private val repository: ProductRepository): ViewModel() {
         }
     }
 
-    fun addProduct(product: Product) {
+    fun getFavorite() {
         viewModelScope.launch {
-            when (repository.addProduct(product)) {
+            when (val result = repository.getFavorite()) {
                 is AppResult.Success -> {
-                    val products = _uiState.value.productList.toMutableList()
-                    products.add(product)
+                    Log.d("db", "getFavorite success")
                     _uiState.update {
-                        it.copy(productList = products)
-                    }
+                        it.copy(favoriteList = result.successData)
+                        }
                 }
                 is AppResult.Error -> {} // handle error
             }
@@ -48,6 +50,7 @@ class ProductViewModel(private val repository: ProductRepository): ViewModel() {
         viewModelScope.launch {
             when (repository.deleteProduct(product)) {
                 is AppResult.Success -> {
+                    Log.d("db", "delete success")
                     val products = _uiState.value.productList.toMutableList()
                     products.remove(product)
                     _uiState.update {
@@ -59,25 +62,4 @@ class ProductViewModel(private val repository: ProductRepository): ViewModel() {
         }
     }
 
-    fun updateProduct(product: Product) {
-        viewModelScope.launch {
-            when (repository.updateProduct(product)) {
-                is AppResult.Success -> {
-                    val products = _uiState.value.productList.toMutableList()
-                    val index = products.indexOfFirst { it.id == product.id }
-                    if (index != -1) {
-                        products[index] = product
-                    }
-                    _uiState.update {
-                        it.copy(productList = products)
-                    }
-                }
-                is AppResult.Error -> {} // handle error
-            }
-        }
-    }
 }
-
-data class MainUiState(
-    val productList: List<Product> = emptyList()
-)

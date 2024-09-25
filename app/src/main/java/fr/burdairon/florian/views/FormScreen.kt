@@ -2,7 +2,6 @@ package fr.burdairon.florian.views
 
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,31 +49,38 @@ import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import fr.burdairon.florian.R
 import fr.burdairon.florian.model.Product
+import fr.burdairon.florian.viewmodels.FormViewModel
+import fr.burdairon.florian.views.destinations.MainScreenDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.getViewModel
 import java.util.Date
 
 @Destination
 @Composable
 fun FormScreen(
-    resultNavigator: ResultBackNavigator<Product>,
+    navigator: DestinationsNavigator,
     snackbarHostState: SnackbarHostState,
-    defaultName: String = ""
+    defaultName: String = "",
+    product: Product? = null
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val formViewModel: FormViewModel = getViewModel()
 
-    var productType by rememberSaveable { mutableStateOf(ProductType.CONSOMMABLE) }
-    var name by rememberSaveable { mutableStateOf(defaultName) }
-    var date by rememberSaveable { mutableStateOf("") }
-    var color: String by rememberSaveable { mutableStateOf("") }
-    var country by rememberSaveable { mutableStateOf("") }
-    var isFavorite by rememberSaveable { mutableStateOf(false) }
+    var productType by rememberSaveable { mutableStateOf(product?.type ?: ProductType.CONSOMMABLE) }
+    var name by rememberSaveable { mutableStateOf(product?.name ?: defaultName) }
+    var date by rememberSaveable { mutableStateOf(product?.date ?: "") }
+    var color: String by rememberSaveable { mutableStateOf(product?.color ?: "") }
+    var country by rememberSaveable { mutableStateOf(product?.country ?: "") }
+    var isFavorite by rememberSaveable { mutableStateOf(product?.isFavorite ?: false) }
 
-    var imageUri: Uri? by rememberSaveable { mutableStateOf(null) }
+    var imageUri: Uri? by rememberSaveable { mutableStateOf(
+        product?.let { Uri.parse(product.image) }
+    ) }
 
     Column(
         modifier = Modifier
@@ -112,7 +118,38 @@ fun FormScreen(
         // Display the validate button
         ValidateButton(productType, name, date, color, country, isFavorite, scope, snackbarHostState) { validate ->
             if (validate) {
-                resultNavigator.navigateBack(Product(id = 0, image = imageUri?.toString() ?: "", type = productType, name = name, date = date, color = color, country = country,  isFavorite = isFavorite))
+                if (product == null) {
+                    formViewModel.addProduct(
+                        Product(
+                            id = 0,
+                            image = imageUri?.toString() ?: "",
+                            type = productType,
+                            name = name,
+                            date = date,
+                            color = color,
+                            country = country,
+                            isFavorite = isFavorite
+                        )
+                    )
+                }
+                else {
+                    formViewModel.updateProduct(
+                        Product(
+                            id = product.id,
+                            image = imageUri?.toString() ?: product.image,
+                            type = productType,
+                            name = name,
+                            date = date,
+                            color = color,
+                            country = country,
+                            isFavorite = isFavorite
+                        )
+                    )
+                }
+                scope.launch {
+                    snackbarHostState.showSnackbar("Le produit a bien été ajouté.")
+                }
+                navigator.navigate(MainScreenDestination())
             }
         }
     }
@@ -133,8 +170,7 @@ fun ProductTypeSelector(productType: ProductType, onProductTypeSelected: (Produc
 
 @Composable
 fun ImageDisplay(uri: Uri?, productType: ProductType) {
-    if (uri == null) {
-        Log.i("image","product type image")
+    if (uri == null || uri.toString().isEmpty()) {
         Image(
             painter = painterResource(id = productType.getDrawable()),
             contentDescription = "Product type image"

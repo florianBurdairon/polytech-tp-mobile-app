@@ -17,30 +17,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.result.NavResult
-import com.ramcosta.composedestinations.result.ResultRecipient
-import fr.burdairon.florian.model.Product
-import fr.burdairon.florian.viewmodels.ProductViewModel
+import fr.burdairon.florian.viewmodels.MainViewModel
 import fr.burdairon.florian.views.destinations.FormScreenDestination
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
 @Destination(start = true)
 @Composable
-fun MainScreen(navigator: DestinationsNavigator, resultRecipient: ResultRecipient<FormScreenDestination, Product>, snackbarHostState: SnackbarHostState) {
+fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHostState) {
     val scope = rememberCoroutineScope()
-    val productViewModel: ProductViewModel = getViewModel()
+    val productViewModel: MainViewModel = getViewModel()
 
     val uiState by productViewModel.uiState.collectAsState()
 
-    resultRecipient.onNavResult {
-        if (it is NavResult.Value) {
-            productViewModel.addProduct(it.value)
-            scope.launch {
-                snackbarHostState.showSnackbar("Le produit a bien été ajouté")
-            }
-        }
-    }
+    productViewModel.getAll()
 
     Column(
         modifier = Modifier
@@ -69,14 +59,17 @@ fun MainScreen(navigator: DestinationsNavigator, resultRecipient: ResultRecipien
                 Text("Tacos")
             }
             Button(
-                onClick = { navigator.navigate(FormScreenDestination(defaultName = "Kebab")) }
+                onClick = { navigator.navigate(FormScreenDestination()) }
             ) {
-                Text("Kebab")
+                Text("Autre")
             }
         }
 
-        ProductList(uiState) {
+        ProductList(uiState, navigator) {
             productViewModel.deleteProduct(it)
+            scope.launch {
+                snackbarHostState.showSnackbar("Produit supprimé")
+            }
         }
     }
 }

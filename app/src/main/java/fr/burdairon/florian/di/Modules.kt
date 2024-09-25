@@ -5,7 +5,8 @@ import fr.burdairon.florian.dao.AppDatabase
 import fr.burdairon.florian.dao.ProductDao
 import fr.burdairon.florian.repositories.ProductRepository
 import fr.burdairon.florian.repositories.ProductRepositoryImpl
-import fr.burdairon.florian.viewmodels.ProductViewModel
+import fr.burdairon.florian.viewmodels.FormViewModel
+import fr.burdairon.florian.viewmodels.MainViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -35,6 +36,9 @@ val repositoryModule = module {
 
 val viewModelModule = module {
     viewModel {
-        ProductViewModel(repository = get())
+        MainViewModel(repository = get())
+    }
+    viewModel {
+        FormViewModel(repository = get())
     }
 }
