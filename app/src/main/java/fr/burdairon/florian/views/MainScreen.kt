@@ -9,6 +9,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,7 +31,11 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
 
     val uiState by productViewModel.uiState.collectAsState()
 
-    productViewModel.getAll()
+    DisposableEffect(Unit) {
+        productViewModel.getAll()
+        onDispose { }
+    }
+
 
     Column(
         modifier = Modifier
