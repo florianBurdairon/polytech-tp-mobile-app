@@ -56,8 +56,7 @@ import fr.burdairon.florian.views.destinations.MainScreenDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
@@ -425,11 +424,8 @@ fun ValidateButton(
 }
 
 private fun convertMillisToDate(millis: Long): String {
-    val tempAccessor = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.getDefault()).parse(Date(millis).toString())
-    val date = LocalDate.from(tempAccessor)
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
-    val formattedDate = date.format(formatter)
-    return formattedDate
+    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return formatter.format(Date(millis))
 }
 
 enum class ProductType {
