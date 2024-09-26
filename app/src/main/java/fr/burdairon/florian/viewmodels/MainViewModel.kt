@@ -88,4 +88,18 @@ class MainViewModel(private val repository: ProductRepository): ViewModel() {
             }
         }
     }
+
+    fun searchProduct(name: String) {
+        viewModelScope.launch {
+            when (val result = repository.getAll()) {
+                is AppResult.Success -> {
+                    Log.d("db", "getAll success")
+                    _uiState.update {
+                        it.copy(productList = result.successData.filter { it.name.contains(name, ignoreCase = true) })
+                    }
+                }
+                is AppResult.Error -> {} // handle error
+            }
+        }
+    }
 }
