@@ -39,8 +39,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.FileProvider
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
@@ -49,6 +51,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import fr.burdairon.florian.R
 import fr.burdairon.florian.model.Product
 import fr.burdairon.florian.utils.convertMillisToDate
+import fr.burdairon.florian.utils.saveCachedFileToStorage
 import fr.burdairon.florian.viewmodels.FormViewModel
 import fr.burdairon.florian.views.components.ImageDisplay
 import fr.burdairon.florian.views.components.ImagePicker
@@ -67,6 +70,7 @@ fun FormScreen(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val fileProvider = stringResource(id = R.string.fileprovider)
     val formViewModel: FormViewModel = getViewModel()
 
     var productType by rememberSaveable { mutableStateOf(product?.type ?: ProductType.CONSOMMABLE) }
@@ -93,7 +97,8 @@ fun FormScreen(
             uri = null,
             directory = context.cacheDir,
             onSetUri = { uri ->
-                imageUri = uri
+                val file = saveCachedFileToStorage(context, uri)
+                imageUri = file?.let { FileProvider.getUriForFile(context, fileProvider, it) }
             }
         )
 
