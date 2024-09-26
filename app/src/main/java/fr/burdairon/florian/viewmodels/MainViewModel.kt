@@ -39,7 +39,7 @@ class MainViewModel(private val repository: ProductRepository): ViewModel() {
                     Log.d("db", "getFavorite success")
                     _uiState.update {
                         it.copy(favoriteList = result.successData)
-                        }
+                    }
                 }
                 is AppResult.Error -> {} // handle error
             }

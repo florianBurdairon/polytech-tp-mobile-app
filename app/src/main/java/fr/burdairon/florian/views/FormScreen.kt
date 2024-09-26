@@ -132,6 +132,9 @@ fun FormScreen(
                             isFavorite = isFavorite
                         )
                     )
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Le produit a bien été ajouté.")
+                    }
                 }
                 else {
                     formViewModel.updateProduct(
@@ -146,9 +149,9 @@ fun FormScreen(
                             isFavorite = isFavorite
                         )
                     )
-                }
-                scope.launch {
-                    snackbarHostState.showSnackbar("Le produit a bien été ajouté.")
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Le produit a bien été modifié.")
+                    }
                 }
                 navigator.navigate(MainScreenDestination())
             }
