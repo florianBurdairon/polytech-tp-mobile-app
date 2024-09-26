@@ -16,22 +16,22 @@ import fr.burdairon.florian.model.Product
 import fr.burdairon.florian.utils.MainUiState
 
 @Composable
-fun FavoriteList(uiState: MainUiState, onProductUpdate: (Product) -> Unit, onProductRemove: (Product) -> Unit) {
-    if (uiState.favoriteList.isEmpty()) {
+fun FavoriteList(mainUiState: MainUiState, onProductUpdate: (Product) -> Unit, onProductRemove: (Product) -> Unit) {
+    if (mainUiState.favoriteList.isEmpty()) {
         Text("Aucun favori")
     }
     else {
         Text("Liste des favoris")
         LazyRow {
-            items(uiState.favoriteList.size) { product ->
-                FavoriteItem(uiState.favoriteList[product],
+            items(mainUiState.favoriteList.size) { product ->
+                FavoriteItem(mainUiState.favoriteList[product],
                     onClick = {
                         // Open form to update product
-                        onProductUpdate(uiState.favoriteList[product])
+                        onProductUpdate(mainUiState.favoriteList[product])
                     },
                     onLongPress = {
                         // Remove the product from the list
-                        onProductRemove(uiState.favoriteList[product])
+                        onProductRemove(mainUiState.favoriteList[product])
                     }
                 )
             }

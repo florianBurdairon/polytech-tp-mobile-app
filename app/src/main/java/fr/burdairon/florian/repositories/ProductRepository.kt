@@ -3,9 +3,7 @@ package fr.burdairon.florian.repositories
 import fr.burdairon.florian.dao.ProductDao
 import fr.burdairon.florian.model.Product
 import fr.burdairon.florian.utils.AppResult
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 interface ProductRepository {
@@ -17,7 +15,6 @@ interface ProductRepository {
 }
 
 class ProductRepositoryImpl(private val dao: ProductDao) : ProductRepository {
-    private val scope = CoroutineScope(Dispatchers.IO)
 
     override suspend fun getAll(): AppResult<List<Product>> {
         val data = withContext(Dispatchers.IO) {
@@ -43,9 +40,9 @@ class ProductRepositoryImpl(private val dao: ProductDao) : ProductRepository {
 
     override suspend fun addProduct(product: Product): AppResult<Unit> {
         try {
-            scope.launch {
+            withContext(Dispatchers.IO) {
                 dao.insert(product)
-            }.join()
+            }
             return AppResult.Success(Unit)
         } catch (e: Exception) {
             return AppResult.Error(e)
@@ -54,9 +51,9 @@ class ProductRepositoryImpl(private val dao: ProductDao) : ProductRepository {
 
     override suspend fun deleteProduct(product: Product): AppResult<Unit> {
         try {
-            scope.launch {
+            withContext(Dispatchers.IO) {
                 dao.delete(product)
-            }.join()
+            }
             return AppResult.Success(Unit)
         } catch (e: Exception) {
             return AppResult.Error(e)
@@ -65,9 +62,9 @@ class ProductRepositoryImpl(private val dao: ProductDao) : ProductRepository {
 
     override suspend fun updateProduct(product: Product): AppResult<Unit> {
         try {
-            scope.launch {
+            withContext(Dispatchers.IO) {
                 dao.update(product)
-            }.join()
+            }
             return AppResult.Success(Unit)
         } catch (e: Exception) {
             return AppResult.Error(e)

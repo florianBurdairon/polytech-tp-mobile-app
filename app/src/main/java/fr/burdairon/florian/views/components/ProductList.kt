@@ -2,10 +2,12 @@ package fr.burdairon.florian.views.components
 
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,24 +21,26 @@ import fr.burdairon.florian.model.Product
 import fr.burdairon.florian.utils.MainUiState
 
 @Composable
-fun ProductList(uiState: MainUiState, onProductUpdate: (Product) -> Unit, onProductRemove: (Product) -> Unit) {
-    if (uiState.productList.isEmpty()) {
+fun ProductList(mainUiState: MainUiState, onProductUpdate: (Product) -> Unit, onProductRemove: (Product) -> Unit) {
+    if (mainUiState.productList.isEmpty()) {
         Text("Aucun produit")
     }
     else {
         Text("Liste des produits")
+        Spacer(modifier = Modifier.height(1.dp).fillMaxWidth().background(color = androidx.compose.ui.graphics.Color.DarkGray))
         LazyColumn {
-            items(uiState.productList.size) { product ->
-                ProductRow(uiState.productList[product],
+            items(mainUiState.productList.size) { product ->
+                ProductRow(mainUiState.productList[product],
                     onClick = {
                         // Open form to update product
-                        onProductUpdate(uiState.productList[product])
+                        onProductUpdate(mainUiState.productList[product])
                     },
                     onLongPress = {
                         // Remove the product from the list
-                        onProductRemove(uiState.productList[product])
+                        onProductRemove(mainUiState.productList[product])
                     }
                 )
+                Spacer(modifier = Modifier.height(1.dp).fillMaxWidth().background(color = androidx.compose.ui.graphics.Color.DarkGray))
             }
         }
     }

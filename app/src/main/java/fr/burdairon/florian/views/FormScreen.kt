@@ -118,46 +118,52 @@ fun FormScreen(
         // Display the favorite checkbox
         LabeledCheckbox(isFavorite, label = { Text("Ajouter aux favoris") }, onCheckedChange = { isFavorite = it })
 
-        // Display the validate button
-        ValidateButton(productType, name, date, color, country, isFavorite, scope, snackbarHostState) { validate ->
-            if (validate) {
-                if (product == null) {
-                    formViewModel.addProduct(
-                        Product(
-                            id = 0,
-                            image = imageUri?.toString() ?: "",
-                            type = productType,
-                            name = name,
-                            date = date,
-                            color = color,
-                            country = country,
-                            isFavorite = isFavorite
+        Row {
+            Button(onClick = { navigator.navigate(MainScreenDestination()) }) {
+                Text("Annuler")
+            }
+            // Display the validate button
+            ValidateButton(productType, name, date, color, country, isFavorite, scope, snackbarHostState) { validate ->
+                if (validate) {
+                    if (product == null) {
+                        formViewModel.addProduct(
+                            Product(
+                                id = 0,
+                                image = imageUri?.toString() ?: "",
+                                type = productType,
+                                name = name,
+                                date = date,
+                                color = color,
+                                country = country,
+                                isFavorite = isFavorite
+                            )
                         )
-                    )
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Le produit a bien été ajouté.")
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Le produit a bien été ajouté.")
+                        }
                     }
-                }
-                else {
-                    formViewModel.updateProduct(
-                        Product(
-                            id = product.id,
-                            image = imageUri?.toString() ?: product.image,
-                            type = productType,
-                            name = name,
-                            date = date,
-                            color = color,
-                            country = country,
-                            isFavorite = isFavorite
+                    else {
+                        formViewModel.updateProduct(
+                            Product(
+                                id = product.id,
+                                image = imageUri?.toString() ?: product.image,
+                                type = productType,
+                                name = name,
+                                date = date,
+                                color = color,
+                                country = country,
+                                isFavorite = isFavorite
+                            )
                         )
-                    )
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Le produit a bien été modifié.")
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Le produit a bien été modifié.")
+                        }
                     }
+                    navigator.navigate(MainScreenDestination())
                 }
-                navigator.navigate(MainScreenDestination())
             }
         }
+
     }
 }
 

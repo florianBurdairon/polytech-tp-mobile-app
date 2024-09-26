@@ -27,6 +27,7 @@ import fr.burdairon.florian.viewmodels.MainViewModel
 import fr.burdairon.florian.views.components.FavoriteList
 import fr.burdairon.florian.views.components.ProductList
 import fr.burdairon.florian.views.destinations.FormScreenDestination
+import fr.burdairon.florian.views.destinations.RestaurantScreenDestination
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
@@ -80,7 +81,7 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
         }
 
         FavoriteList(
-            uiState = uiState,
+            mainUiState = uiState,
             onProductUpdate = {
                 navigator.navigate(FormScreenDestination(product = it))
             },
@@ -106,7 +107,7 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
             label = { Text("Filtrer par nom") }
         )
         ProductList(
-            uiState = uiState,
+            mainUiState = uiState,
             onProductUpdate = {
                 navigator.navigate(FormScreenDestination(product = it))
             },
@@ -117,6 +118,13 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
                 }
             }
         )
+        Button(
+            onClick = {
+                navigator.navigate(RestaurantScreenDestination())
+            }
+        ) {
+            Text("Voir les restaurants")
+        }
     }
 }
 
