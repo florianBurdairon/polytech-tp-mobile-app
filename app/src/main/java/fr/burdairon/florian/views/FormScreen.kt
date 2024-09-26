@@ -1,7 +1,6 @@
 package fr.burdairon.florian.views
 
 import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,10 +39,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import coil.compose.AsyncImage
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
@@ -51,14 +48,14 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import fr.burdairon.florian.R
 import fr.burdairon.florian.model.Product
+import fr.burdairon.florian.utils.convertMillisToDate
 import fr.burdairon.florian.viewmodels.FormViewModel
+import fr.burdairon.florian.views.components.ImageDisplay
+import fr.burdairon.florian.views.components.ImagePicker
 import fr.burdairon.florian.views.destinations.MainScreenDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Destination
 @Composable
@@ -169,21 +166,6 @@ fun ProductTypeSelector(productType: ProductType, onProductTypeSelected: (Produc
             RadioButton(selected = productType == type, onClick = { onProductTypeSelected(type) })
             Text(text = type.toString())
         }
-    }
-}
-
-@Composable
-fun ImageDisplay(uri: Uri?, productType: ProductType) {
-    if (uri == null || uri.toString().isEmpty()) {
-        Image(
-            painter = painterResource(id = productType.getDrawable()),
-            contentDescription = "Product type image"
-        )
-    } else {
-        AsyncImage(
-            model = uri,
-            contentDescription = "Product image"
-        )
     }
 }
 
@@ -424,11 +406,6 @@ fun ValidateButton(
             }
         }
     }
-}
-
-private fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return formatter.format(Date(millis))
 }
 
 enum class ProductType {

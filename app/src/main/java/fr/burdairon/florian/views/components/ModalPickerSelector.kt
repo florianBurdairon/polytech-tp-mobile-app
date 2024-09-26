@@ -1,4 +1,4 @@
-package fr.burdairon.florian.views
+package fr.burdairon.florian.views.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

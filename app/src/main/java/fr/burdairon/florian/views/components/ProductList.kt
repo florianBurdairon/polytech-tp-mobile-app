@@ -1,4 +1,4 @@
-package fr.burdairon.florian.views
+package fr.burdairon.florian.views.components
 
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -15,13 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import fr.burdairon.florian.model.Product
 import fr.burdairon.florian.utils.MainUiState
-import fr.burdairon.florian.views.destinations.FormScreenDestination
 
 @Composable
-fun ProductList(uiState: MainUiState, navigator: DestinationsNavigator, onProductRemove: (Product) -> Unit) {
+fun ProductList(uiState: MainUiState, onProductUpdate: (Product) -> Unit, onProductRemove: (Product) -> Unit) {
     if (uiState.productList.isEmpty()) {
         Text("Aucun produit")
     }
@@ -29,23 +27,28 @@ fun ProductList(uiState: MainUiState, navigator: DestinationsNavigator, onProduc
         Text("Liste des produits")
         LazyColumn {
             items(uiState.productList.size) { product ->
-                ProductRow(uiState.productList[product], navigator) {
-                    // Remove the product from the list
-                    onProductRemove(uiState.productList[product])
-                }
+                ProductRow(uiState.productList[product],
+                    onClick = {
+                        // Open form to update product
+                        onProductUpdate(uiState.productList[product])
+                    },
+                    onLongPress = {
+                        // Remove the product from the list
+                        onProductRemove(uiState.productList[product])
+                    }
+                )
             }
         }
     }
-
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ProductRow(product: Product, navigator: DestinationsNavigator, onLongPress : () -> Unit = {}) {
+fun ProductRow(product: Product, onClick : () -> Unit = {}, onLongPress : () -> Unit = {}) {
     Row (
         modifier = Modifier.fillMaxWidth().height(100.dp).padding(10.dp).combinedClickable(
             onClick = {
-                navigator.navigate(FormScreenDestination(product = product))
+                onClick()
             },
             onLongClick = {
                 onLongPress()

@@ -1,4 +1,4 @@
-package fr.burdairon.florian.views
+package fr.burdairon.florian.views.components
 
 import android.Manifest
 import android.content.pm.PackageManager

@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import fr.burdairon.florian.viewmodels.MainViewModel
+import fr.burdairon.florian.views.components.FavoriteList
+import fr.burdairon.florian.views.components.ProductList
 import fr.burdairon.florian.views.destinations.FormScreenDestination
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
@@ -27,12 +29,13 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHostState) {
     val scope = rememberCoroutineScope()
-    val productViewModel: MainViewModel = getViewModel()
+    val mainViewModel: MainViewModel = getViewModel()
 
-    val uiState by productViewModel.uiState.collectAsState()
+    val uiState by mainViewModel.uiState.collectAsState()
 
     DisposableEffect(Unit) {
-        productViewModel.getAll()
+        mainViewModel.getAll()
+        mainViewModel.getFavorite()
         onDispose { }
     }
 
@@ -70,12 +73,31 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
             }
         }
 
-        ProductList(uiState, navigator) {
-            productViewModel.deleteProduct(it)
-            scope.launch {
-                snackbarHostState.showSnackbar("Produit supprimé")
+        FavoriteList(
+            uiState = uiState,
+            onProductUpdate = {
+                navigator.navigate(FormScreenDestination(product = it))
+            },
+            onProductRemove = {
+                mainViewModel.removeFavorite(it)
+                scope.launch {
+                    snackbarHostState.showSnackbar("Le produit a bien été supprimé des favoris.")
+                }
             }
-        }
+        )
+
+        ProductList(
+            uiState = uiState,
+            onProductUpdate = {
+                navigator.navigate(FormScreenDestination(product = it))
+            },
+            onProductRemove = {
+                mainViewModel.deleteProduct(it)
+                scope.launch {
+                    snackbarHostState.showSnackbar("Le produit a bien été supprimé.")
+                }
+            }
+        )
     }
 }
 

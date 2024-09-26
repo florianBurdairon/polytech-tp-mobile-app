@@ -53,8 +53,8 @@ class MainViewModel(private val repository: ProductRepository): ViewModel() {
                     Log.d("db", "delete success")
                     val products = _uiState.value.productList.toMutableList()
                     products.remove(product)
-                    _uiState.update {
-                        it.copy(productList = products)
+                    _uiState.update { mainUiState ->
+                        mainUiState.copy(productList = products, favoriteList = products.filter { it.isFavorite })
                     }
                 }
                 is AppResult.Error -> {} // handle error
@@ -62,4 +62,30 @@ class MainViewModel(private val repository: ProductRepository): ViewModel() {
         }
     }
 
+    fun removeFavorite(product: Product) {
+        viewModelScope.launch {
+            val tempProduct = Product(
+                id = product.id,
+                name = product.name,
+                type = product.type,
+                date = product.date,
+                color = product.color,
+                country = product.country,
+                image = product.image,
+                isFavorite = false
+            )
+            when (repository.updateProduct(tempProduct)) {
+                is AppResult.Success -> {
+                    Log.d("db", "update success")
+                    val products = _uiState.value.productList.toMutableList()
+                    val index = products.indexOfFirst { it.id == product.id }
+                    products[index] = tempProduct
+                    _uiState.update { mainUiState ->
+                        mainUiState.copy(productList = products, favoriteList = products.filter { it.isFavorite })
+                    }
+                }
+                is AppResult.Error -> {} // handle error
+            }
+        }
+    }
 }
