@@ -9,5 +9,6 @@ data class MainUiState(
 )
 
 data class RestaurantUiState(
+    val apiSuccess: Boolean = true,
     val restaurantList: List<Restaurant> = emptyList()
 )

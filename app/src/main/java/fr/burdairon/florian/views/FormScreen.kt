@@ -25,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -142,7 +143,7 @@ fun FormScreen(
                             )
                         )
                         scope.launch {
-                            snackbarHostState.showSnackbar("Le produit a bien été ajouté.")
+                            snackbarHostState.showSnackbar("Le produit a bien été ajouté.", duration = SnackbarDuration.Short)
                         }
                     }
                     else {

@@ -29,7 +29,10 @@ import fr.burdairon.florian.utils.RestaurantUiState
 fun RestaurantList(restaurantUiState: RestaurantUiState, onEndScroll: () -> Unit = {}) {
     val listState = rememberLazyListState()
 
-    if (restaurantUiState.restaurantList.isEmpty()) {
+    if (!restaurantUiState.apiSuccess) {
+        Text("Impossible de récupérer les données")
+    }
+    else if (restaurantUiState.restaurantList.isEmpty()) {
         Text("Aucun restaurant trouvé")
     }
     else {
@@ -51,7 +54,7 @@ fun RestaurantList(restaurantUiState: RestaurantUiState, onEndScroll: () -> Unit
         LaunchedEffect(key1 = listState) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull() }
                 .collect { lastVisibleItem ->
-                    if (lastVisibleItem != null && lastVisibleItem.index == restaurantUiState.restaurantList.size - 1) {
+                    if (lastVisibleItem != null && lastVisibleItem.index == restaurantUiState.restaurantList.size - 5) {
                         Log.d("api", "onEndScroll")
                         onEndScroll()
                     }

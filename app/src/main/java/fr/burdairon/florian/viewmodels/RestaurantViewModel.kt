@@ -23,10 +23,15 @@ class RestaurantViewModel(private val repository: RestaurantRepository): ViewMod
                 is AppResult.Success -> {
                     Log.d("api", "getRestaurants success")
                     _uiState.update {
-                        it.copy(restaurantList = result.successData)
+                        it.copy(apiSuccess = true, restaurantList = result.successData)
                     }
                 }
-                is AppResult.Error -> {} // handle error
+                is AppResult.Error -> {
+                    Log.d("api", "getRestaurants error")
+                    _uiState.update {
+                        it.copy(apiSuccess = false)
+                    }
+                } // handle error
             }
         }
     }
@@ -39,10 +44,15 @@ class RestaurantViewModel(private val repository: RestaurantRepository): ViewMod
                 is AppResult.Success -> {
                     Log.d("api", "loadMore success")
                     _uiState.update {
-                        it.copy(restaurantList = currentList + result.successData)
+                        it.copy(apiSuccess = true, restaurantList = currentList + result.successData)
                     }
                 }
-                is AppResult.Error -> {} // handle error
+                is AppResult.Error -> {
+                    Log.d("api", "loadMore error")
+                    _uiState.update {
+                        it.copy(apiSuccess = false)
+                    }
+                } // handle error
             }
         }
     }
