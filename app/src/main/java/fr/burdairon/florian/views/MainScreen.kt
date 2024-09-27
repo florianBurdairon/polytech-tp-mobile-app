@@ -1,12 +1,17 @@
 package fr.burdairon.florian.views
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -106,24 +111,29 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
             modifier = Modifier.fillMaxWidth().padding(10.dp),
             label = { Text("Filtrer par nom") }
         )
-        ProductList(
-            mainUiState = uiState,
-            onProductUpdate = {
-                navigator.navigate(FormScreenDestination(product = it))
-            },
-            onProductRemove = {
-                mainViewModel.deleteProduct(it)
-                scope.launch {
-                    snackbarHostState.showSnackbar("Le produit a bien été supprimé.")
-                }
-            }
-        )
-        Button(
-            onClick = {
-                navigator.navigate(RestaurantScreenDestination())
-            }
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text("Voir les restaurants")
+            ProductList(
+                mainUiState = uiState,
+                onProductUpdate = {
+                    navigator.navigate(FormScreenDestination(product = it))
+                },
+                onProductRemove = {
+                    mainViewModel.deleteProduct(it)
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Le produit a bien été supprimé.")
+                    }
+                }
+            )
+            ExtendedFloatingActionButton(
+                onClick = {
+                    navigator.navigate(RestaurantScreenDestination())
+                },
+                modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
+                icon = { Icon(Icons.Filled.LocationOn, "Voir les restaurants") },
+                text = { Text("Voir les restaurants") },
+            )
         }
     }
 }

@@ -38,6 +38,8 @@ fun RestaurantScreen(navigator: DestinationsNavigator) {
         }) {
             Text("Retour")
         }
-        RestaurantList(restaurantUiState = uiState)
+        RestaurantList(restaurantUiState = uiState) {
+            restaurantViewModel.loadMore()
+        }
     }
 }

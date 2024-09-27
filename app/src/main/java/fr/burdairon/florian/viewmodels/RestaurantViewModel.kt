@@ -30,4 +30,20 @@ class RestaurantViewModel(private val repository: RestaurantRepository): ViewMod
             }
         }
     }
+
+    fun loadMore() {
+        viewModelScope.launch {
+            val currentList = _uiState.value.restaurantList
+            val offset = currentList.size
+            when (val result = repository.getRestaurants(offset)) {
+                is AppResult.Success -> {
+                    Log.d("api", "loadMore success")
+                    _uiState.update {
+                        it.copy(restaurantList = currentList + result.successData)
+                    }
+                }
+                is AppResult.Error -> {} // handle error
+            }
+        }
+    }
 }

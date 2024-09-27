@@ -26,21 +26,29 @@ fun ProductList(mainUiState: MainUiState, onProductUpdate: (Product) -> Unit, on
         Text("Aucun produit")
     }
     else {
-        Text("Liste des produits")
-        Spacer(modifier = Modifier.height(1.dp).fillMaxWidth().background(color = androidx.compose.ui.graphics.Color.DarkGray))
-        LazyColumn {
-            items(mainUiState.productList.size) { product ->
-                ProductRow(mainUiState.productList[product],
-                    onClick = {
-                        // Open form to update product
-                        onProductUpdate(mainUiState.productList[product])
-                    },
-                    onLongPress = {
-                        // Remove the product from the list
-                        onProductRemove(mainUiState.productList[product])
-                    }
-                )
-                Spacer(modifier = Modifier.height(1.dp).fillMaxWidth().background(color = androidx.compose.ui.graphics.Color.DarkGray))
+        Column {
+            Text("Liste des produits")
+            Spacer(
+                modifier = Modifier.height(1.dp).fillMaxWidth()
+                    .background(color = androidx.compose.ui.graphics.Color.DarkGray)
+            )
+            LazyColumn {
+                items(mainUiState.productList.size) { product ->
+                    ProductRow(mainUiState.productList[product],
+                        onClick = {
+                            // Open form to update product
+                            onProductUpdate(mainUiState.productList[product])
+                        },
+                        onLongPress = {
+                            // Remove the product from the list
+                            onProductRemove(mainUiState.productList[product])
+                        }
+                    )
+                    Spacer(
+                        modifier = Modifier.height(1.dp).fillMaxWidth()
+                            .background(color = androidx.compose.ui.graphics.Color.DarkGray)
+                    )
+                }
             }
         }
     }
