@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,7 +70,7 @@ fun ProductRow(product: Product, onClick : () -> Unit = {}, onLongPress : () -> 
         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start)
     ) {
         // Display the product
-        ImageDisplay(Uri.parse(product.image), product.type)
+        ImageDisplay(Uri.parse(product.image), product.type, Modifier.size(100.dp))
         Column {
             Text(product.name)
             Text(product.type.toString())
