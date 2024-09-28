@@ -52,6 +52,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import fr.burdairon.florian.R
 import fr.burdairon.florian.model.Product
+import fr.burdairon.florian.utils.convertDateToMillis
 import fr.burdairon.florian.utils.convertMillisToDate
 import fr.burdairon.florian.utils.saveCachedFileToStorage
 import fr.burdairon.florian.viewmodels.FormViewModel
@@ -202,7 +203,9 @@ fun DateField(
 ) {
     var dialogVisibility by remember { mutableStateOf(false) }
 
-    val datePickerState = rememberDatePickerState(selectableDates = object : SelectableDates {
+    val dateMillis = if(date.isNotBlank()) convertDateToMillis(date) + 1000 * 60 * 60 * 24 else null
+
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = dateMillis ?: System.currentTimeMillis(), selectableDates = object : SelectableDates {
         override fun isSelectableDate(utcTimeMillis: Long): Boolean {
             return utcTimeMillis <= System.currentTimeMillis()
         }

@@ -67,6 +67,6 @@ fun FavoriteItem(product: Product, onClick : () -> Unit = {}, onLongPress : () -
     ) {
         // Display the product
         ImageDisplay(Uri.parse(product.image), product.type, modifier = Modifier.size(80.dp))
-        Text(product.name)
+        Text(product.name, color = Color.White)
     }
 }

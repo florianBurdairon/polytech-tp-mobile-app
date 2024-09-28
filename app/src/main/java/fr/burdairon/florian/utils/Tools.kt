@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
-import androidx.compose.ui.graphics.vector.path
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -16,6 +15,11 @@ import java.util.Locale
 fun convertMillisToDate(millis: Long): String {
     val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     return formatter.format(Date(millis))
+}
+
+fun convertDateToMillis(date: String): Long {
+    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return formatter.parse(date)?.time ?: 0
 }
 
 fun saveCachedFileToStorage(context: Context, cacheFileUri: Uri): File? {

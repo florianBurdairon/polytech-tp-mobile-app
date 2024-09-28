@@ -28,7 +28,7 @@ fun ProductList(mainUiState: MainUiState, onProductUpdate: (Product) -> Unit, on
     }
     else {
         Column {
-            Text("Liste des produits")
+            Text("Liste des produits", modifier = Modifier.padding(start = 10.dp))
             Spacer(
                 modifier = Modifier.height(1.dp).fillMaxWidth()
                     .background(color = androidx.compose.ui.graphics.Color.DarkGray)

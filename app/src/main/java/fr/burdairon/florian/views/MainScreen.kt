@@ -107,7 +107,7 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
                     mainViewModel.getAll()
                 }
             },
-            modifier = Modifier.fillMaxWidth().padding(5.dp),
+            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
             label = { Text("Filtrer par nom") }
         )
         Box(
