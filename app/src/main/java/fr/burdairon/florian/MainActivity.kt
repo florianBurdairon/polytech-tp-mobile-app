@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.dependency
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val snackbarHostState = remember { SnackbarHostState() }
+            val snackBarScope = rememberCoroutineScope()
             PolytechAppMobileTheme {
                 Scaffold (
                     snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -33,8 +35,12 @@ class MainActivity : ComponentActivity() {
                     DestinationsNavHost(
                         navGraph = NavGraphs.root,
                         modifier = Modifier.padding(innerPadding),
+                        // Dependencies
+                        // Used to share variables between screens
+                        // Here we share the SnackbarHostState and the coroutine scope to be able to show snackbars from any screen
                         dependenciesContainerBuilder = {
                             dependency(snackbarHostState)
+                            dependency(snackBarScope)
                         }
                     )
                 }

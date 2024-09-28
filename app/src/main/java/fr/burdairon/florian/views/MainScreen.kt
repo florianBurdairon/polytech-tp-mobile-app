@@ -21,7 +21,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,13 +32,13 @@ import fr.burdairon.florian.views.components.FavoriteList
 import fr.burdairon.florian.views.components.ProductList
 import fr.burdairon.florian.views.destinations.FormScreenDestination
 import fr.burdairon.florian.views.destinations.RestaurantScreenDestination
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
 @Destination(start = true)
 @Composable
-fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHostState) {
-    val scope = rememberCoroutineScope()
+fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHostState, snackbarScope: CoroutineScope) {
     val mainViewModel: MainViewModel = getViewModel()
 
     val uiState by mainViewModel.uiState.collectAsState()
@@ -92,7 +91,7 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
             },
             onProductRemove = {
                 mainViewModel.removeFavorite(it)
-                scope.launch {
+                snackbarScope.launch {
                     snackbarHostState.showSnackbar("Le produit a bien été supprimé des favoris.")
                 }
             }
@@ -121,7 +120,7 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
                 },
                 onProductRemove = {
                     mainViewModel.deleteProduct(it)
-                    scope.launch {
+                    snackbarScope.launch {
                         snackbarHostState.showSnackbar("Le produit a bien été supprimé.")
                     }
                 }
@@ -130,7 +129,7 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
                 onClick = {
                     navigator.navigate(RestaurantScreenDestination())
                 },
-                modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
+                modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),
                 icon = { Icon(Icons.Filled.LocationOn, "Voir les restaurants") },
                 text = { Text("Voir les restaurants") },
             )
