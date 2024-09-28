@@ -20,7 +20,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,10 +42,15 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
     val mainViewModel: MainViewModel = getViewModel()
 
     val uiState by mainViewModel.uiState.collectAsState()
-    var nameFilter by remember { mutableStateOf("") }
+    var nameFilter by rememberSaveable { mutableStateOf("") }
 
     DisposableEffect(Unit) {
-        mainViewModel.getAll()
+        if (nameFilter.isBlank()) {
+            mainViewModel.getAll()
+        }
+        else {
+            mainViewModel.searchProduct(nameFilter)
+        }
         mainViewModel.getFavorite()
         onDispose { }
     }

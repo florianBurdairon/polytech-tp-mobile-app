@@ -64,22 +64,13 @@ class MainViewModel(private val repository: ProductRepository): ViewModel() {
 
     fun removeFavorite(product: Product) {
         viewModelScope.launch {
-            val tempProduct = Product(
-                id = product.id,
-                name = product.name,
-                type = product.type,
-                date = product.date,
-                color = product.color,
-                country = product.country,
-                image = product.image,
-                isFavorite = false
-            )
-            when (repository.updateProduct(tempProduct)) {
+            product.isFavorite = false
+            when (repository.updateProduct(product)) {
                 is AppResult.Success -> {
                     Log.d("db", "update success")
                     val products = _uiState.value.productList.toMutableList()
                     val index = products.indexOfFirst { it.id == product.id }
-                    products[index] = tempProduct
+                    products[index] = product
                     _uiState.update { mainUiState ->
                         mainUiState.copy(productList = products, favoriteList = products.filter { it.isFavorite })
                     }

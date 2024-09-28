@@ -16,5 +16,5 @@ class Product(
     val date: String,
     val color: String,
     val country: String,
-    val isFavorite: Boolean
+    var isFavorite: Boolean
 ) : Parcelable
