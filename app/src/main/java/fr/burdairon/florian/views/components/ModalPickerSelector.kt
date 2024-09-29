@@ -23,12 +23,12 @@ import androidx.compose.ui.unit.dp
 import fr.burdairon.florian.R
 
 @Composable
-fun MyModalBottomSheet(
+fun ModalPickerSelector(
     onDismiss: () -> Unit,
     onTakePhotoClick: () -> Unit,
     onPhotoGalleryClick: () -> Unit
 ) {
-    MyModalBottomSheetContent(
+    ModalPickerSelectorContent(
         header = "Choisir une option",
         onDismiss = {
             onDismiss.invoke()
@@ -54,7 +54,7 @@ fun MyModalBottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyModalBottomSheetContent(
+fun ModalPickerSelectorContent(
     onDismiss: () -> Unit,
     //header
     header: String = "Choisir une option",

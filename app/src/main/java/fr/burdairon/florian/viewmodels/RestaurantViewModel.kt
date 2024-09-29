@@ -27,11 +27,12 @@ class RestaurantViewModel(private val repository: RestaurantRepository): ViewMod
                     }
                 }
                 is AppResult.Error -> {
+                    // handle error
                     Log.d("api", "getRestaurants error")
                     _uiState.update {
                         it.copy(apiSuccess = false)
                     }
-                } // handle error
+                }
             }
         }
     }
@@ -48,11 +49,12 @@ class RestaurantViewModel(private val repository: RestaurantRepository): ViewMod
                     }
                 }
                 is AppResult.Error -> {
+                    // handle error
                     Log.d("api", "loadMore error")
                     _uiState.update {
                         it.copy(apiSuccess = false)
                     }
-                } // handle error
+                }
             }
         }
     }

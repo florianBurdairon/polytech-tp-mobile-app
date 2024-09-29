@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,18 +23,49 @@ import fr.burdairon.florian.model.Product
 import fr.burdairon.florian.utils.MainUiState
 
 @Composable
-fun ProductList(mainUiState: MainUiState, onProductUpdate: (Product) -> Unit, onProductRemove: (Product) -> Unit) {
+fun ProductList(mainUiState: MainUiState, buttonValues: List<String?>, header: @Composable () -> Unit = {}, onNewProduct: (String?) -> Unit = {}, onProductUpdate: (Product) -> Unit, onProductRemove: (Product) -> Unit) {
     if (mainUiState.productList.isEmpty()) {
         Text("Aucun produit")
     }
     else {
-        Column {
-            Text("Liste des produits", modifier = Modifier.padding(start = 10.dp))
-            Spacer(
-                modifier = Modifier.height(1.dp).fillMaxWidth()
-                    .background(color = androidx.compose.ui.graphics.Color.DarkGray)
-            )
+        Column (
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            // List of buttons to add a new product
+            if (buttonValues.isNotEmpty()) {
+                Text("Ajouter un produit")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        10.dp,
+                        Alignment.CenterHorizontally
+                    )
+                ) {
+                    buttonValues.forEach {
+                        Button(
+                            onClick = { onNewProduct(it) }
+                        ) {
+                            Text(it ?: "Autre")
+                        }
+                    }
+                }
+                Spacer(
+                    modifier = Modifier.height(1.dp).fillMaxWidth()
+                        .background(color = androidx.compose.ui.graphics.Color.DarkGray)
+                )
+            }
             LazyColumn {
+                // Scrollable header for the product list
+                item {
+                    header()
+                    Text("Liste des produits", modifier = Modifier.padding(start = 10.dp))
+                    Spacer(
+                        modifier = Modifier.height(1.dp).fillMaxWidth()
+                            .background(color = androidx.compose.ui.graphics.Color.DarkGray)
+                    )
+                }
+                // Display the products
                 items(mainUiState.productList.size) { product ->
                     ProductRow(mainUiState.productList[product],
                         onClick = {

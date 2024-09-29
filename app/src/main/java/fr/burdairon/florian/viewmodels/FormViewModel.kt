@@ -12,22 +12,28 @@ class FormViewModel(private val repository: ProductRepository): ViewModel() {
 
     fun addProduct(product: Product) {
         viewModelScope.launch {
-            when (repository.addProduct(product)) {
+            when (val result = repository.addProduct(product)) {
                 is AppResult.Success -> {
                     Log.d("db", "insert success")
                 }
-                is AppResult.Error -> {} // handle error
+                is AppResult.Error -> {
+                    // handle error
+                    Log.e("ProductRepository", result.message)
+                }
             }
         }
     }
 
     fun updateProduct(product: Product) {
         viewModelScope.launch {
-            when (repository.updateProduct(product)) {
+            when (val result = repository.updateProduct(product)) {
                 is AppResult.Success -> {
                     Log.d("db", "update success")
                 }
-                is AppResult.Error -> {} // handle error
+                is AppResult.Error -> {
+                    // handle error
+                    Log.e("ProductRepository", result.message)
+                }
             }
         }
     }

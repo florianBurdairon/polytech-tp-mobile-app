@@ -39,6 +39,7 @@ fun RestaurantScreen(navigator: DestinationsNavigator) {
             Text("Retour")
         }
         RestaurantList(restaurantUiState = uiState) {
+            // When the user scrolls to the end of the list, call the API to get more restaurants
             restaurantViewModel.loadMore()
         }
     }

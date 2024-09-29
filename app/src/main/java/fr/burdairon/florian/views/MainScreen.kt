@@ -3,13 +3,11 @@ package fr.burdairon.florian.views
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
@@ -45,100 +43,78 @@ fun MainScreen(navigator: DestinationsNavigator, snackbarHostState: SnackbarHost
     var nameFilter by rememberSaveable { mutableStateOf("") }
 
     DisposableEffect(Unit) {
-        if (nameFilter.isBlank()) {
-            mainViewModel.getAll()
-        }
-        else {
-            mainViewModel.searchProduct(nameFilter)
-        }
+        mainViewModel.getAll(nameFilter)
         mainViewModel.getFavorite()
         onDispose { }
     }
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(15.dp)
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text ("Ajouter un produit")
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
-        ) {
-            Button(
-                onClick = { navigator.navigate(FormScreenDestination(defaultName = "Pizza")) }
-            ) {
-                Text("Pizza")
-            }
-            Button(
-                onClick = { navigator.navigate(FormScreenDestination(defaultName = "Burger")) }
-            ) {
-                Text("Burger")
-            }
-            Button(
-                onClick = { navigator.navigate(FormScreenDestination(defaultName = "Tacos")) }
-            ) {
-                Text("Tacos")
-            }
-            Button(
-                onClick = { navigator.navigate(FormScreenDestination()) }
-            ) {
-                Text("Autre")
-            }
-        }
-
-        FavoriteList(
+        ProductList(
             mainUiState = uiState,
+            // Open form to add a new product
+            onNewProduct = { name ->
+                navigator.navigate(FormScreenDestination(name ?: ""))
+            },
+            // Open form to update product
             onProductUpdate = {
                 navigator.navigate(FormScreenDestination(product = it))
             },
+            // Remove the product from the list
             onProductRemove = {
-                mainViewModel.removeFavorite(it)
+                mainViewModel.deleteProduct(it)
                 snackbarScope.launch {
-                    snackbarHostState.showSnackbar("Le produit a bien été supprimé des favoris.")
+                    snackbarHostState.showSnackbar("Le produit a bien été supprimé.")
+                }
+            },
+            // List of buttons to add a new product
+            buttonValues = listOf("Pizza", "Burger", "Tacos", null),
+            // Scrollable header for the product list
+            // Contains the favorite list and the search bar
+            header = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(15.dp)
+                ) {
+                    // Display the favorite list
+                    FavoriteList(
+                        mainUiState = uiState,
+                        onProductUpdate = {
+                            navigator.navigate(FormScreenDestination(product = it))
+                        },
+                        onProductRemove = {
+                            mainViewModel.removeFavorite(it)
+                            snackbarScope.launch {
+                                snackbarHostState.showSnackbar("Le produit a bien été supprimé des favoris.")
+                            }
+                        }
+                    )
+                    // Display the search bar
+                    TextField(
+                        value = nameFilter,
+                        onValueChange = {
+                            nameFilter = it
+                            mainViewModel.getAll(nameFilter)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
+                        label = { Text("Filtrer par nom") }
+                    )
                 }
             }
         )
-        TextField(
-            value = nameFilter,
-            onValueChange = {
-                nameFilter = it
-                if (it.isNotEmpty()) {
-                    mainViewModel.searchProduct(it)
-                }
-                else {
-                    mainViewModel.getAll()
-                }
+        // Display the button to access the restaurant list (API)
+        ExtendedFloatingActionButton(
+            onClick = {
+                navigator.navigate(RestaurantScreenDestination())
             },
-            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
-            label = { Text("Filtrer par nom") }
+            modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),
+            icon = { Icon(Icons.Filled.LocationOn, "Voir les restaurants") },
+            text = { Text("Voir les restaurants") },
         )
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            ProductList(
-                mainUiState = uiState,
-                onProductUpdate = {
-                    navigator.navigate(FormScreenDestination(product = it))
-                },
-                onProductRemove = {
-                    mainViewModel.deleteProduct(it)
-                    snackbarScope.launch {
-                        snackbarHostState.showSnackbar("Le produit a bien été supprimé.")
-                    }
-                }
-            )
-            ExtendedFloatingActionButton(
-                onClick = {
-                    navigator.navigate(RestaurantScreenDestination())
-                },
-                modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),
-                icon = { Icon(Icons.Filled.LocationOn, "Voir les restaurants") },
-                text = { Text("Voir les restaurants") },
-            )
-        }
     }
 }
 

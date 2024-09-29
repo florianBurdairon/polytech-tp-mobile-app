@@ -18,20 +18,25 @@ class MainViewModel(private val repository: ProductRepository): ViewModel() {
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
-    fun getAll() {
+    // Get all products from the database. Can be filtered by name.
+    fun getAll(nameFilter: String = "") {
         viewModelScope.launch {
             when (val result = repository.getAll()) {
                 is AppResult.Success -> {
                     Log.d("db", "getAll success")
-                    _uiState.update {
-                        it.copy(productList = result.successData)
+                    _uiState.update { state ->
+                        state.copy(productList = result.successData.filter { it.name.contains(nameFilter, ignoreCase = true) })
                     }
                 }
-                is AppResult.Error -> {} // handle error
+                is AppResult.Error -> {
+                    // handle error
+                    Log.e("ProductRepository", result.message)
+                }
             }
         }
     }
 
+    // Get all favorite products from the database.
     fun getFavorite() {
         viewModelScope.launch {
             when (val result = repository.getFavorite()) {
@@ -41,14 +46,18 @@ class MainViewModel(private val repository: ProductRepository): ViewModel() {
                         it.copy(favoriteList = result.successData)
                     }
                 }
-                is AppResult.Error -> {} // handle error
+                is AppResult.Error -> {
+                    // handle error
+                    Log.e("ProductRepository", result.message)
+                }
             }
         }
     }
 
+    // Delete a product from the database.
     fun deleteProduct(product: Product) {
         viewModelScope.launch {
-            when (repository.deleteProduct(product)) {
+            when (val result = repository.deleteProduct(product)) {
                 is AppResult.Success -> {
                     Log.d("db", "delete success")
                     val products = _uiState.value.productList.toMutableList()
@@ -57,15 +66,19 @@ class MainViewModel(private val repository: ProductRepository): ViewModel() {
                         mainUiState.copy(productList = products, favoriteList = products.filter { it.isFavorite })
                     }
                 }
-                is AppResult.Error -> {} // handle error
+                is AppResult.Error -> {
+                    // handle error
+                    Log.e("ProductRepository", result.message)
+                }
             }
         }
     }
 
+    // Remove a product from the favorite list.
     fun removeFavorite(product: Product) {
         viewModelScope.launch {
             product.isFavorite = false
-            when (repository.updateProduct(product)) {
+            when (val result = repository.updateProduct(product)) {
                 is AppResult.Success -> {
                     Log.d("db", "update success")
                     val products = _uiState.value.productList.toMutableList()
@@ -75,21 +88,10 @@ class MainViewModel(private val repository: ProductRepository): ViewModel() {
                         mainUiState.copy(productList = products, favoriteList = products.filter { it.isFavorite })
                     }
                 }
-                is AppResult.Error -> {} // handle error
-            }
-        }
-    }
-
-    fun searchProduct(name: String) {
-        viewModelScope.launch {
-            when (val result = repository.getAll()) {
-                is AppResult.Success -> {
-                    Log.d("db", "getAll success")
-                    _uiState.update {
-                        it.copy(productList = result.successData.filter { it.name.contains(name, ignoreCase = true) })
-                    }
+                is AppResult.Error -> {
+                    // handle error
+                    Log.e("ProductRepository", result.message)
                 }
-                is AppResult.Error -> {} // handle error
             }
         }
     }

@@ -92,7 +92,7 @@ fun ImagePicker(
 
     var showBottomSheet by remember { mutableStateOf(false) }
     if (showBottomSheet){
-        MyModalBottomSheet(
+        ModalPickerSelector(
             onDismiss = {
                 showBottomSheet = false
             },

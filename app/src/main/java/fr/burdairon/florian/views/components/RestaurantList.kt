@@ -21,6 +21,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.burdairon.florian.model.Restaurant
 import fr.burdairon.florian.utils.RestaurantUiState
@@ -29,12 +30,15 @@ import fr.burdairon.florian.utils.RestaurantUiState
 fun RestaurantList(restaurantUiState: RestaurantUiState, onEndScroll: () -> Unit = {}) {
     val listState = rememberLazyListState()
 
-    if (!restaurantUiState.apiSuccess) {
+    // Check if the list is empty and the API call has failed
+    if (restaurantUiState.restaurantList.isEmpty() && !restaurantUiState.apiSuccess) {
         Text("Impossible de récupérer les données")
     }
+    // Check if the list is empty and the API call has succeeded
     else if (restaurantUiState.restaurantList.isEmpty()) {
         Text("Aucun restaurant trouvé")
     }
+    // If the list is not empty, display it
     else {
         Text("Liste des restaurants", modifier = Modifier.padding(10.dp))
         Spacer(modifier = Modifier
@@ -42,6 +46,7 @@ fun RestaurantList(restaurantUiState: RestaurantUiState, onEndScroll: () -> Unit
             .fillMaxWidth()
             .background(color = androidx.compose.ui.graphics.Color.DarkGray))
         LazyColumn(state = listState) {
+            // For each restaurant, display a row
             items(restaurantUiState.restaurantList.size) { restaurant ->
                 RestaurantRow(restaurantUiState.restaurantList[restaurant])
                 Spacer(modifier = Modifier
@@ -49,13 +54,24 @@ fun RestaurantList(restaurantUiState: RestaurantUiState, onEndScroll: () -> Unit
                     .fillMaxWidth()
                     .background(color = androidx.compose.ui.graphics.Color.DarkGray))
             }
+            // If the API call has failed, display an error message
+            if (!restaurantUiState.apiSuccess) {
+                item {
+                    Text(
+                        text = "Impossible de récupérer les données",
+                        modifier = Modifier.padding(10.dp).fillMaxWidth() ,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
         }
 
+        // When the user scrolls to the end of the list, call the onEndScroll function
         LaunchedEffect(key1 = listState) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull() }
                 .collect { lastVisibleItem ->
                     if (lastVisibleItem != null && lastVisibleItem.index == restaurantUiState.restaurantList.size - 5) {
-                        Log.d("api", "onEndScroll")
+                        Log.d("RestaurantList", "onEndScroll")
                         onEndScroll()
                     }
                 }

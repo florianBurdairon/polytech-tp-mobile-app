@@ -97,6 +97,7 @@ fun FormScreen(
     ) {
         // Display the product type image
         ImageDisplay(imageUri, productType)
+        // Display a button to pick an image from the gallery or take a new one
         ImagePicker(
             uri = null,
             directory = context.cacheDir,
@@ -109,6 +110,7 @@ fun FormScreen(
         // Display the product type radio buttons
         ProductTypeSelector(productType, onProductTypeSelected = { productType = it })
 
+        // Display the name text field
         TextField(value = name, onValueChange = { name = it }, label = { Text("Nom du produit*") })
 
         // Display the date picker dialog
@@ -117,12 +119,14 @@ fun FormScreen(
         // Display the color picker dialog
         ColorField(color) { color = it.hexCode }
 
+        // Display the country text field
         TextField(value = country, onValueChange = { country = it }, label = { Text("Pays d'origine") })
 
         // Display the favorite checkbox
         LabeledCheckbox(isFavorite, label = { Text("Ajouter aux favoris") }, onCheckedChange = { isFavorite = it })
 
         Row {
+            // Display the cancel button
             Button(onClick = { navigator.navigate(MainScreenDestination()) }) {
                 Text("Annuler")
             }
@@ -131,6 +135,7 @@ fun FormScreen(
             ValidateButton(productType, name, date, color, country, isFavorite, scope, snackbarHostState) { validate ->
                 if (validate) {
                     if (product == null) {
+                        // Add the product to the database
                         formViewModel.addProduct(
                             Product(
                                 id = 0,
@@ -148,6 +153,7 @@ fun FormScreen(
                         }
                     }
                     else {
+                        // Update the product in the database
                         formViewModel.updateProduct(
                             Product(
                                 id = product.id,
